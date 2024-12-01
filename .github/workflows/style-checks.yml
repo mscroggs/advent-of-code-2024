@@ -1,0 +1,22 @@
+name: ✨
+
+on:
+  push:
+    branches: ["**"]
+
+jobs:
+  style-checks:
+    name: Style checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt,clippy
+
+      - name: Rust style checks
+        run: |
+          cargo fmt -- --check
+          cargo clippy -- -D warnings
+          cargo clippy --features test_input -- -D warnings
