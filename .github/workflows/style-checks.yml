@@ -14,9 +14,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt,clippy
-
-      - name: ls
-        run: ls
+      - uses: actions/checkout@v4
       - name: Rust style checks
         run: |
           cargo fmt -- --check
