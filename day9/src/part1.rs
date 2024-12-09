@@ -50,14 +50,6 @@ fn main() {
             filesystem[index] = filesystem.pop().unwrap();
         }
     }
-    for i in &filesystem {
-        if let FileBlock::File(value) = *i {
-            print!("{value}");
-        } else {
-            print!(".");
-        }
-    }
-    println!();
 
     let mut total = 0;
     for (i, j) in filesystem.iter().enumerate() {
