@@ -43,10 +43,10 @@ fn main() {
         stones = new_stones;
     }
 
-    let total = stones.values().sum::<usize>();
+    let total = stones.values().sum::<i64>();
 
     #[cfg(feature = "test_input")]
     assert_eq!(total, 55312);
 
-    println!("{}", total);
+    println!("{total}");
 }
