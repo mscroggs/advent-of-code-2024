@@ -27,9 +27,9 @@ fn main() {
 
         let mut ip = 0;
         let mut output = vec![];
-        while ip < program.len() {
-            let combo = if [0, 2, 5, 6, 7].contains(&program[ip]) {
-                match program[ip + 1] {
+        while (ip as usize) < program.len() {
+            let combo = if [0, 2, 5, 6, 7].contains(&program[ip as usize]) {
+                match program[ip as usize + 1] {
                     0 => 0,
                     1 => 1,
                     2 => 2,
@@ -47,8 +47,8 @@ fn main() {
             } else {
                 0
             };
-            let literal = program[ip + 1];
-            match program[ip] {
+            let literal = program[ip as usize + 1];
+            match program[ip as usize] {
                 0 => {
                     a /= i64::pow(2, combo as u32);
                 }
@@ -60,7 +60,7 @@ fn main() {
                 }
                 3 => {
                     if a != 0 {
-                        ip = literal as usize - 2;
+                        ip = literal - 2;
                     }
                 }
                 4 => {
