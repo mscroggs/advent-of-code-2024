@@ -1,6 +1,66 @@
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
+fn one_loop(a: i64, program: &[i64]) -> i64 {
+    let mut a = a;
+    let mut b = 0;
+    let mut c = 0;
+
+    let mut ip = 0;
+    loop {
+        let combo = if [0, 2, 5, 6, 7].contains(&program[ip as usize]) {
+            match program[ip as usize + 1] {
+                0 => 0,
+                1 => 1,
+                2 => 2,
+                3 => 3,
+                4 => a,
+                5 => b,
+                6 => c,
+                7 => {
+                    panic!("Cannot use reserved combo operand 7");
+                }
+                _ => {
+                    panic!("Invalid combo operand");
+                }
+            }
+        } else {
+            0
+        };
+        let literal = program[ip as usize + 1];
+        match program[ip as usize] {
+            0 => {
+                a /= i64::pow(2, combo as u32);
+            }
+            1 => {
+                b ^= literal;
+            }
+            2 => {
+                b = combo % 8;
+            }
+            3 => {
+                panic!("This shouldn't happen");
+            }
+            4 => {
+                b ^= c;
+            }
+            5 => {
+                return combo % 8;
+            }
+            6 => {
+                b = a / i64::pow(2, combo as u32);
+            }
+            7 => {
+                c = a / i64::pow(2, combo as u32);
+            }
+            _ => {
+                panic!("Invalid instruction");
+            }
+        }
+        ip += 2;
+    }
+}
+
 fn main() {
     #[cfg(feature = "test_input")]
     let file = File::open("test_input_part2").unwrap();
@@ -19,84 +79,21 @@ fn main() {
         .map(|i| i.parse::<i64>().unwrap())
         .collect::<Vec<_>>();
 
-    let mut start = 0;
-    loop {
-        let mut a = start;
-        let mut b = 0;
-        let mut c = 0;
-
-        let mut ip = 0;
-        let mut output = vec![];
-        while (ip as usize) < program.len() {
-            let combo = if [0, 2, 5, 6, 7].contains(&program[ip as usize]) {
-                match program[ip as usize + 1] {
-                    0 => 0,
-                    1 => 1,
-                    2 => 2,
-                    3 => 3,
-                    4 => a,
-                    5 => b,
-                    6 => c,
-                    7 => {
-                        panic!("Cannot use reserved combo operand 7");
-                    }
-                    _ => {
-                        panic!("Invalid combo operand");
-                    }
-                }
-            } else {
-                0
-            };
-            let literal = program[ip as usize + 1];
-            match program[ip as usize] {
-                0 => {
-                    a /= i64::pow(2, combo as u32);
-                }
-                1 => {
-                    b ^= literal;
-                }
-                2 => {
-                    b = combo % 8;
-                }
-                3 => {
-                    if a != 0 {
-                        ip = literal - 2;
-                    }
-                }
-                4 => {
-                    b ^= c;
-                }
-                5 => {
-                    output.push(combo % 8);
-                    if output.len() > program.len()
-                        || output[output.len() - 1] != program[output.len() - 1]
-                    {
-                        break;
-                    }
-                }
-                6 => {
-                    b = a / i64::pow(2, combo as u32);
-                }
-                7 => {
-                    c = a / i64::pow(2, combo as u32);
-                }
-                _ => {
-                    panic!("Invalid instruction");
+    let mut good = vec![0];
+    for i in program.iter().rev() {
+        let mut new_good = vec![];
+        for g in good {
+            for n in 8 * g..8 * g + 8 {
+                if one_loop(n, &program) == *i {
+                    new_good.push(n);
                 }
             }
-            ip += 2
         }
-        if output.len() > 9 {
-            println!("{start} {output:?}");
-        }
-        if output == program {
-            break;
-        }
-        start += 1;
+        good = new_good;
     }
 
     #[cfg(feature = "test_input")]
-    assert_eq!(start, 117440);
+    assert_eq!(good[0], 117440);
 
-    println!("{start}");
+    println!("{}", good[0]);
 }
